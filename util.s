@@ -26,15 +26,14 @@ ignore_result:
 
 ;;easy as pie
 div_by_hex:
-        phx
-        ldx #$00
-        stx remainder
-        ldx #$04
-hex_div_loop:
-        clc
-        rol value
-        rol remainder
-        dex
-        bne hex_div_loop
-        plx
+        pha
+        lda value
+        and #$0f                ;keep only low nibble
+        sta remainder
+
+        lsr value               ;move hi nibble into low nible pos
+        lsr value
+        lsr value
+        lsr value
+        pla
         rts

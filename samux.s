@@ -13,10 +13,9 @@ RW = %01000000
 RS = %00100000
 control_bit_mask = %11100000
 
-counter = $00                   ;location of the counter
-last_toggle = $03
-program_sreg = $04              ;flag variable for software use
-display_counter = $05
+program_sreg = $00              ;flag variable for software use
+counter = $01                   ;location of the counter
+last_toggle = $04
 
 ;;two 1 byte values
 value = $0200
@@ -27,9 +26,11 @@ remainder = $0201
 
 splash: .asciiz "samux kernel :3"
 version_num: .asciiz "v0.0.1"
-hello_msg: .asciiz "hiii"
-number: .byte "A"
+hello_msg: .asciiz "stack starts at:"
 _start:
+        ldx #$FF
+        txs
+
         lda #$0                 ;init counter
         sta counter
         sta counter+$1
@@ -38,6 +39,9 @@ _start:
         sta program_sreg
         sta remainder
         sta remainder+1
+
+        tsx
+        stx value
 
         jsr init_ports
         jsr init_timer
@@ -77,38 +81,33 @@ _loop:
         lda #$01
         sta program_sreg
 
-        jsr print_hello
-
-        lda number
-        sta value
+        jsr print_stack_prefix
 
         lda #$01
         jsr go_to_line
+
+;;hex prefix
+        lda #"0"
+        jsr print_char
+        lda #"x"
+        jsr print_char
+
         jsr print_stack
 
         jmp _loop
 
-
-print_display_counter:
-        pha
-        jsr return_home
-        lda display_counter
-        jsr print_char
-        pla
-        rts
-
-print_hello:
+print_stack_prefix:
         pha
         jsr clear_screen
         jsr return_home
         ldx #$0
-print_hello_loop:
+print_stack_loop:
         lda hello_msg, x
-        beq exit_print_hello
+        beq exit_stack_hello
         jsr print_char
         inx
-        jmp print_hello_loop
-exit_print_hello:
+        jmp print_stack_loop
+exit_stack_hello:
         pla
         rts
 
@@ -116,10 +115,16 @@ print_stack:
         jsr div_by_hex
 
         lda remainder           ;print remainder of divide
+        cmp #$0A          ;if not greater than 10
+        bcc not_letter    ;only add ascii "0"
+        clc
+        adc #("A"-10)           ;minus ten because lowest letter is 0x0A = 10
+        jmp print_stack_char
+not_letter:
         clc
         adc #"0"
+print_stack_char:
         jsr print_char
-
 
         lda value               ;check if any data left in value to div
         bne print_stack         ;keep dividing if yes
