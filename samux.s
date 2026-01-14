@@ -11,7 +11,6 @@ IER = $600E
 E = %10000000
 RW = %01000000
 RS = %00100000
-control_bit_mask = %11100000
 
 program_sreg = $00              ;flag variable for software use
 counter = $01                   ;location of the counter
@@ -38,7 +37,6 @@ _start:
         sta last_toggle
         sta program_sreg
         sta remainder
-        sta remainder+1
 
         tsx
         stx value
@@ -70,65 +68,12 @@ print_version_loop:
         jmp print_version_loop
 
 _loop:
-        lda program_sreg
+        lda program_sreg        ;check if program sreg lsb is set
         and #$01
         bne _loop
-
-        lda counter
-        cmp #$ff
-        bne _loop
-
-        lda #$01
-        sta program_sreg
-
-        jsr print_stack_prefix
-
-        lda #$01
-        jsr go_to_line
-
-;;hex prefix
-        lda #"0"
-        jsr print_char
-        lda #"x"
-        jsr print_char
-
-        jsr print_stack
+        jsr print_stack_splash
 
         jmp _loop
-
-print_stack_prefix:
-        pha
-        jsr clear_screen
-        jsr return_home
-        ldx #$0
-print_stack_loop:
-        lda hello_msg, x
-        beq exit_stack_hello
-        jsr print_char
-        inx
-        jmp print_stack_loop
-exit_stack_hello:
-        pla
-        rts
-
-print_stack:
-        jsr div_by_hex
-
-        lda remainder           ;print remainder of divide
-        cmp #$0A          ;if not greater than 10
-        bcc not_letter    ;only add ascii "0"
-        clc
-        adc #("A"-10)           ;minus ten because lowest letter is 0x0A = 10
-        jmp print_stack_char
-not_letter:
-        clc
-        adc #"0"
-print_stack_char:
-        jsr print_char
-
-        lda value               ;check if any data left in value to div
-        bne print_stack         ;keep dividing if yes
-        rts
 
 toggle_led:
         lda counter
@@ -144,13 +89,16 @@ toggle_led:
 end_toggle:
         rts
 
+;;code for stack splash printing
+        .include "print_stack.s"
+
 ;;init code for ports and timers
         .include "init.s"
 
 ;;screen related boiler plate code
         .include "screen.s"
 
-;;screen related boiler plate code
+;;utility code
         .include "util.s"
 
 

@@ -1,7 +1,7 @@
 ;;sreg
 ;;clobbers portb and porta
 init_screen:
-        pha    
+        pha
 
 ;;sending the function set 3 times to init by instruction
         lda #%00111000          ;function set (set 8-bit mode, 2 line displayt, 5x8 font)
@@ -25,7 +25,7 @@ init_screen:
         jsr lcd_instruction_send
 
         jsr clear_screen
-        
+
         pla
         rts
 
@@ -44,7 +44,7 @@ nop_wait_loop:
         bne nop_wait_loop
         plx
         rts
-        
+
 ;;sreg
 clear_screen:
         pha
@@ -59,7 +59,7 @@ clear_screen:
 ;;clobers porta
 return_home:
         pha
-        lda #%10000000          ;use set ddram to move to line 0 
+        lda #%10000000          ;use set ddram to move to line 0
         sta PORTB
         jsr lcd_instruction_send
         pla
@@ -82,13 +82,13 @@ lcd_wait:
         pha
         lda #%00000000                  ;set drrb to input to read busy flag
         sta DDRB
-reread:        
+reread:
         lda #RW                 ;set read/write
         sta PORTA
-        
-        lda #(RW|E)                  ;toggle enable        
+
+        lda #(RW|E)                  ;toggle enable
         sta PORTA
-        
+
         lda PORTB               ;read busy flag
         and #%10000000          ;compare with top bit (bf)
         bne reread
@@ -126,6 +126,6 @@ print_char:
 
         lda #RS                  ;toggle enable
         sta PORTA
-        
+
         pla
         rts
