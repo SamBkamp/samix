@@ -27,7 +27,7 @@ remainder = $0201
 
         .org $8000
 
-splash: .asciiz "samux kernel :3"
+splash: .asciiz "samix kernel :3"
 version_num: .asciiz "v0.0.1"
 hello_msg: .asciiz "stack starts at:"
 _start:
@@ -56,7 +56,7 @@ _start:
 _loop:
         lda PORTA
         and #BTN_START
-        beq dit_dah
+        beq _main
 
         lda program_sreg        ;check if program sreg lsb is set
         and #$01
@@ -80,7 +80,7 @@ toggle_led:
 end_toggle:
         rts
 
-;;printing actual program to run
+;;include your actual program file here
         .include "ditdah.s"
 
 ;;printing kernel splash
