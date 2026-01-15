@@ -15,6 +15,14 @@ After this, the kernel splash will printed to the lcd. Then, once the counter re
 
 After the kernel startup sequence, the kernel hands off control to the user defined program through a jump. The kernel will jump to _main (which will need to be defined at compile time) and the user defined program will take control. You can write your _main in the `samix.s` file, but I suggest to instead use vasm's `.include` directive.
 
+If you simply compile this project without making any changes, ditdah will be compiled as the default "user-space" program.
+
+### compilation
+
+`make` will compile the binaries into a binary file called rom.bin
+
+and `make install` will install it onto the AT28C256 rom chip using minipro
+
 
 ### run-time routines
 
