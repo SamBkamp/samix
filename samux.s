@@ -45,32 +45,17 @@ _start:
         jsr init_timer
         jsr init_screen
 
+        jsr print_kernel_splash
+        
         cli
-
-        ldx #$0
-print_splash_loop:
-        lda splash, x
-        beq prep_version_print
-        jsr print_char
-        inx
-        jmp print_splash_loop
-
-prep_version_print:
-        lda #$01
-        jsr go_to_line
-        ldx #$0
-
-print_version_loop:
-        lda version_num, x
-        beq _loop
-        jsr print_char
-        inx
-        jmp print_version_loop
 
 _loop:
         lda program_sreg        ;check if program sreg lsb is set
+        and #%00000010
+        bne dit_dah
+        lda program_sreg
         and #$01
-        bne _loop
+        bne _loop        
         jsr print_stack_splash
 
         jmp _loop
@@ -88,6 +73,12 @@ toggle_led:
         sta last_toggle
 end_toggle:
         rts
+
+;;printing actual program to run 
+        .include "ditdah.s"
+        
+;;printing kernel splash
+        .include "print_splash.s"
 
 ;;code for stack splash printing
         .include "print_stack.s"
@@ -117,8 +108,14 @@ _irq:
         pha
         bit T1CL
         jsr incr_timer
-exit_irq:
         jsr toggle_led
+        lda PORTA
+        and #%00000010
+        bne exit_irq
+        lda #%00000010
+        ora program_sreg
+        sta program_sreg
+exit_irq:
         pla
         rti
 

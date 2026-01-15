@@ -4,7 +4,7 @@ init_ports:
         lda #$ff                ;all pints port b output
         sta DDRB
 
-        lda #%11111111          ;top 3 pins, bottom pin port a to output
+        lda #%11100001        ;top 3 pins, bottom pin port a to output
         sta DDRA
 
         lda #$0                 ;init both ports to pull down
