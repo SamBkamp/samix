@@ -50,16 +50,18 @@ _start:
         jsr init_screen
 
         jsr print_kernel_splash
-        
+
         cli
 
 _loop:
+        lda PORTA
+        and #BTN_START
+        beq dit_dah
+
         lda program_sreg        ;check if program sreg lsb is set
-        and #%00000010
-        bne dit_dah
-        lda program_sreg
         and #$01
-        bne _loop        
+        bne _loop
+
         jsr print_stack_splash
 
         jmp _loop
@@ -78,9 +80,9 @@ toggle_led:
 end_toggle:
         rts
 
-;;printing actual program to run 
+;;printing actual program to run
         .include "ditdah.s"
-        
+
 ;;printing kernel splash
         .include "print_splash.s"
 
