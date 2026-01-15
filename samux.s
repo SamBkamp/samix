@@ -12,6 +12,10 @@ E = %10000000
 RW = %01000000
 RS = %00100000
 
+BTN_START = %00001000
+BTN_A = %00000010
+BTN_B = %00000100
+
 program_sreg = $00              ;flag variable for software use
 counter = $01                   ;location of the counter
 last_toggle = $04
