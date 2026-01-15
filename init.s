@@ -19,7 +19,7 @@ init_timer:
         lda #%01000000          ;free-run mode
         sta ACR
 
-        lda #$19                ;int. every 10k cycles. @1mhz -> every 10ms (i think)
+        lda #$10                ;int. every 10k cycles. @1mhz -> every 10ms (i think)
         sta T1CL
         lda #$27
         sta T1CH                ;init the counters (starts count down)

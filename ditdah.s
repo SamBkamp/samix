@@ -1,3 +1,4 @@
+_main = dit_dah
 ;;one byte data
 counter_index = $0202
 ;;amount of bytes printed
