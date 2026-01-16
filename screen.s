@@ -47,7 +47,6 @@ clear_screen:
         lda #%00000001          ;clear display command
         sta PORTB
         jsr lcd_instruction_send
-        jsr nop_wait
         pla
         rts
 
