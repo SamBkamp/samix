@@ -20,6 +20,7 @@ dit_dah:
         jsr clear_screen
         lda #">"
         jsr print_char
+        jsr debounce_delay      ;so that start btn doesn't roll over and print garbage on first loop
 dit_dah_loop:
         lda PORTA
         and #BTN_A              ;check if A pressed
@@ -58,6 +59,7 @@ B_NOT_PRESSED:
         jsr go_to_line
         inc string_len_counter
         jsr print_string_stored
+
         lda #$00
         jsr go_to_line
         lda #%00010100          ;cursor/display shift one to the right
