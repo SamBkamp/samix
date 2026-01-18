@@ -4,7 +4,11 @@ print_splash_loop:
         lda splash, x
         beq prep_version_print
         inx
-        jsr print_char
+        phx
+        ldx #$00
+        brk
+        nop
+        plx
         jmp print_splash_loop
 
 prep_version_print:
@@ -15,7 +19,11 @@ prep_version_print:
 print_version_loop:
         lda version_num, x
         beq print_kernel_splash_exit
-        jsr print_char
+        phx
+        ldx #$00
+        brk
+        nop
+        plx
         inx
         jmp print_version_loop
 

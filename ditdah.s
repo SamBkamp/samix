@@ -1,10 +1,10 @@
 _main = dit_dah
 ;;one byte data
-counter_index = $0202
+counter_index = $0300
 ;;amount of bytes printed
-string_len_counter = $0203
+string_len_counter = $0301
 ;;8 bytes max
-string = $0204
+string = $0302
 
 dit_dah:
         lda #$00
@@ -19,7 +19,9 @@ dit_dah:
         sta string_len_counter
         jsr clear_screen
         lda #">"
-        jsr print_char
+        ldx #$00
+        brk
+        nop
         jsr debounce_delay      ;so that start btn doesn't roll over and print garbage on first loop
 dit_dah_loop:
         lda PORTA
@@ -27,7 +29,9 @@ dit_dah_loop:
         bne A_NOT_PRESSED
 
         lda #"0"                ;print . if yes
-        jsr print_char
+        ldx #$00
+        brk
+        nop
         ldx string_len_counter
         lda string, x
         asl                     ;add 0 to lsb of current letter
@@ -39,7 +43,9 @@ A_NOT_PRESSED:
         bne B_NOT_PRESSED
 
         lda #"1"                ;print - if yes
-        jsr print_char
+        ldx #$00
+        brk
+        nop
         ldx string_len_counter
         lda string, x
         asl                     ;add 0 to lsb of current letter
@@ -53,7 +59,9 @@ B_NOT_PRESSED:
 
         jsr clear_screen        ;clear display, also homes
         lda #">"
-        jsr print_char
+        ldx #$00
+        brk
+        nop
 
         lda #$01                ;go to second line
         jsr go_to_line
@@ -78,7 +86,11 @@ print_string_stored:
         beq end_stored_loop
 print_stored_loop:
         lda string, x
-        jsr print_char
+        phx
+        ldx #$00
+        brk
+        nop
+        plx
         inx
         cpx string_len_counter
         bne print_stored_loop

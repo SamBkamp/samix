@@ -21,10 +21,12 @@ program_sreg = $00              ;flag variable for software use
 counter = $01                   ;location of the counter
 last_toggle = $04
 
-;;two 1 byte values
+;;one byte values
 value = $0200
 remainder = $0201
-
+irq_a_store = $0202
+irq_x_store = $0203
+irq_y_store = $0204
 
         .org $8000
 
@@ -114,18 +116,22 @@ exit_incr_timer:
 _nmi:
         rti
 _irq:
-        pha
-        pha
+        sta irq_a_store
+        stx irq_x_store
+        sty irq_y_store
         lda IFR
         and #%10000000
-        bne timer_interrupt_section
-        pla
+        bne service_timer
+service_syscall:                ;this whole section functions as an indexed jsr call (ie. implementing the nonexistend jsr (#,x) )
+        lda irq_a_store
         ldy #>exit_irq           ;load hi byte of return address
         phy
         ldy #<exit_irq           ;load lo byte of return address
         phy                     ;store data on the stack for rts later
-        jmp ($FF00)
-timer_interrupt_section:
+        ldy irq_y_store
+        jmp (syscall_table, x)
+        ;this doesn't fall through as the return address is set for exit_irq
+service_timer:
         bit T1CL
         jsr incr_timer
         jsr toggle_led
@@ -137,12 +143,14 @@ timer_interrupt_section:
         sta program_sreg
 exit_irq:
         nop
-        pla
+        lda irq_a_store
+        ldx irq_x_store
+        ldy irq_y_store
         rti
 
 ;;syscall table, the page before the jump table
-syscall_table:
         .org $FF00
+syscall_table:
         .word print_char
 
 ;; jump table

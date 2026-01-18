@@ -19,7 +19,6 @@ print_stack_splash:
         nop
 
         lda #"x"
-        ldx #$00
         brk
         nop
 
@@ -36,7 +35,11 @@ print_stack_prefix:
 print_stack_loop:
         lda hello_msg, x
         beq exit_stack_hello
-        jsr print_char
+        phx
+        ldx #$00
+        brk
+        nop
+        plx
         inx
         jmp print_stack_loop
 exit_stack_hello:
@@ -56,7 +59,9 @@ not_letter:
         clc
         adc #"0"
 print_stack_char:
-        jsr print_char
+        ldx #$00
+        brk
+        nop
 
         lda value               ;check if any data left in value to div
         bne print_stack_address ;keep dividing if yes
