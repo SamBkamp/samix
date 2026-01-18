@@ -115,14 +115,16 @@ _nmi:
         rti
 _irq:
         pha
+        pha
         lda IFR
         and #%10000000
         bne timer_interrupt_section
-        ldy #>exit_irq          ;load hi byte of return address
+        pla
+        ldy #>exit_irq           ;load hi byte of return address
         phy
-        ldy #<exit_irq          ;load lo byte of return address
+        ldy #<exit_irq           ;load lo byte of return address
         phy                     ;store data on the stack for rts later
-        jmp (syscall_table, x)
+        jmp ($FF00)
 timer_interrupt_section:
         bit T1CL
         jsr incr_timer

@@ -16,9 +16,13 @@ print_stack_splash:
         lda #"0"
         ldx #$00
         brk
+        nop
+
         lda #"x"
-        jsr print_char
-        
+        ldx #$00
+        brk
+        nop
+
         jsr print_stack_address
 end_print_stack_splash:
         rts
@@ -42,8 +46,8 @@ exit_stack_hello:
 print_stack_address:
         jsr div_by_hex
 
-        lda remainder           ;print remainder of divide 
-        cmp #$0A          ;if not greater than 10        
+        lda remainder           ;print remainder of divide
+        cmp #$0A          ;if not greater than 10
         bcc not_letter    ;only add ascii "0"
         clc
         adc #("A"-10)           ;minus ten because lowest letter is 0x0A = 10
@@ -57,4 +61,3 @@ print_stack_char:
         lda value               ;check if any data left in value to div
         bne print_stack_address ;keep dividing if yes
         rts
-
