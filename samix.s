@@ -13,10 +13,6 @@ RW = %01000000
 RS = %00100000
 LCD_CTL_MASK = %11100000
 
-BTN_START = %00001000
-BTN_A = %00000010
-BTN_B = %00000100
-
 program_sreg = $00              ;flag variable for software use
 counter = $01                   ;location of the counter
 last_toggle = $04
@@ -57,9 +53,6 @@ _start:
         cli
 
 _loop:
-        lda PORTA
-        and #BTN_START
-        beq hand_off_to_user_space     ;only hand program control to user-space program if start has been pressed
 
         lda program_sreg        ;check if program sreg lsb is set
         and #$01
@@ -67,6 +60,8 @@ _loop:
 
         jsr print_stack_splash
         jmp _loop
+
+        beq hand_off_to_user_space     ;only hand program control to user-space program if start has been pressed
 hand_off_to_user_space:
         jsr _main
         jmp _loop
@@ -86,7 +81,7 @@ end_toggle:
         rts
 
 ;;include your actual program file here
-        .include "ditdah.s"
+        .include "echo.s"
 
 ;;printing kernel splash
         .include "print_splash.s"
