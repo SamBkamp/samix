@@ -29,10 +29,18 @@ and `make install` will install it onto the AT28C256 rom chip using minipro
 samix implements some syscalls which user-space programs can use by using the `brk` instruction
 
 **IMPORTANT NOTE ABOUT SYSCALLS:**
-A weird quirk with the brk instruction is that most assemblers treat it as a one-byte instruction, whereas the CPU treats it as a 2 byte instruction. This causes issues with return alignment in many cases. *if your assembler assembles brk as a one-byte instructrion, you must follow the brk immediately with a nop to preserve return-address alignment*. Example:
+A weird quirk with the brk instruction is that most assemblers treat it as a one-byte instruction, whereas the CPU treats it as a 2 byte instruction. This causes issues with return alignment in many cases. _if your assembler assembles brk as a one-byte instructrion, you must follow the brk immediately with a nop to preserve return-address alignment_. Example:
 
 ```asm
         ldx #$00    ;syscall number
         brk         ;call syscall
         nop         ;alignment
 ```
+
+### syscall list
+
+| Name       | Description                                                                                         | A    | X | Y |
+|------------|-----------------------------------------------------------------------------------------------------|------|---|---|
+| print_char | prints char `char` to lcd                                                                           | char | 0 |   |
+| div_by_ten | divides value in memory at location `value` by 10, puts remainder in memory at location `remainder` |      | 1 |   |
+| _main      | the main program                                                                                    |      | 2 |   |

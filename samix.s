@@ -152,6 +152,8 @@ exit_irq:
         .org $FF00
 syscall_table:
         .word print_char
+        .word div_by_ten
+        .word _main
 
 ;; jump table
         .org $FFFA
