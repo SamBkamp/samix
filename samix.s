@@ -8,11 +8,6 @@ T1CH = $6005
 IFR = $600D
 IER = $600E
 
-E = %10000000
-RW = %01000000
-RS = %00100000
-LCD_CTL_MASK = %11100000
-
 program_sreg = $00              ;flag variable for software use
 counter = $01                   ;location of the counter
 last_toggle = $04
@@ -48,9 +43,10 @@ _start:
         jsr init_timer
         jsr init_screen
 
+        cli
+
         jsr print_kernel_splash
 
-        cli
 
 _loop:
         lda counter+$1
@@ -96,7 +92,7 @@ end_toggle:
         .include "init.s"
 
 ;;screen related boiler plate code
-        .include "screen.s"
+        .include "screen_4bit.s"
 
 ;;utility code
         .include "util.s"
@@ -149,7 +145,7 @@ exit_irq:
 ;;syscall table, the page before the jump table
         .org $FF00
 syscall_table:
-        .word print_char
+        .word write
         .word div_by_ten
         .word _main
 

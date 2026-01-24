@@ -4,12 +4,11 @@ init_ports:
         lda #$ff                ;all pints port b output
         sta DDRB
 
-        lda #%11100001        ;top 3 pins, bottom pin port a to output
+        lda #%11110001        ;top 3 pins, bottom pin port a to output
         sta DDRA
 
-        lda #$0                 ;init both ports to pull down
+        lda #%00010000          ;rs232 tx pin pulled hi by default
         sta PORTA
-        sta PORTB
 
         rts
 

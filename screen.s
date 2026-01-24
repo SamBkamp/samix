@@ -1,3 +1,7 @@
+E = %10000000
+RW = %01000000
+RS = %00100000
+LCD_CTL_MASK = %11100000
 ;;sreg
 ;;clobbers portb and porta
 init_screen:
@@ -110,7 +114,9 @@ lcd_instruction_send:
         pla
         rts
 
-print_char:
+
+write:
+print_char_to_lcd:
         jsr lcd_wait
         sta PORTB
         pha
