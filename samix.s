@@ -9,7 +9,7 @@ IFR = $600D
 IER = $600E
 
 program_sreg = $00              ;flag variable for software use
-counter = $01                   ;location of the counter
+counter = $01                   ;3 byte value
 last_toggle = $04
 
 ;;one byte values
@@ -42,6 +42,8 @@ _start:
         jsr init_ports
         jsr init_timer
         jsr init_screen
+
+        cli
 
         jsr print_kernel_splash
 
@@ -80,22 +82,22 @@ end_toggle:
         .include "echo.s"
 
 ;;printing kernel splash
-        .include "print_splash.s"
+        .include "./print_routines/print_splash.s"
 
 ;;code for stack splash printing
-        .include "print_stack.s"
+        .include "./print_routines/print_stack.s"
 
 ;;init code for ports and timers
-        .include "init.s"
+        .include "./kernel_utils/init.s"
 
 ;;screen related boiler plate code
-        .include "screen_4bit.s"
+        .include "./lcd/screen_4bit.s"
 
 ;;utility code
-        .include "util.s"
+        .include "./kernel_utils/util.s"
 
 ;;syscall handlers
-        .include "syscall.s"
+        .include "./kernel_utils/syscall.s"
 
 
 incr_timer:
