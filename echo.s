@@ -5,6 +5,7 @@ char = $0300
 NEWLINE = $0a
 RETURN = $0d
 
+;;acia addresses
 ACIA_DATA_REG = $5000
 ACIA_STATUS_REG = $5001
 ACIA_CMD_REG = $5002
@@ -30,10 +31,6 @@ DTR_ENABLED = %00000001         ;dtr ready
 ;;9600 baud = ~104us per bit
 motd: .asciiz "Welcome to samix!"
 echo:
-        jsr clear_screen
-
-        lda #">"
-        jsr print_char
 
         ;init acia
         lda #$00
@@ -44,6 +41,9 @@ echo:
         sta ACIA_CMD_REG
 
         jsr print_motd
+        lda #">"
+        sta ACIA_DATA_REG
+        jsr uart_bug_loop
 
 event_loop:
         lda ACIA_STATUS_REG
@@ -51,8 +51,17 @@ event_loop:
         beq event_loop
 
         lda ACIA_DATA_REG
-        jsr print_char
+        cmp #RETURN
+        bne not_return
         sta ACIA_DATA_REG
+        jsr uart_bug_loop
+        lda #NEWLINE
+        sta ACIA_DATA_REG
+        jsr uart_bug_loop
+        lda #">"
+not_return:
+        sta ACIA_DATA_REG
+        jsr uart_bug_loop
         jmp event_loop
         rts
 
@@ -60,8 +69,13 @@ event_loop:
 print_motd:
         ldx #$00
 print_motd_loop:
-        lda motd, x
+        lda splash_art, x
         beq end_loop
+        cmp #NEWLINE
+        bne motd_not_newline_char
+        jsr serial_char
+        lda #RETURN
+motd_not_newline_char:
         jsr serial_char
         inx
         jmp print_motd_loop

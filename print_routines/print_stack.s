@@ -1,12 +1,5 @@
 print_stack_splash:
 
-        lda counter
-        cmp #$ff
-        bne end_print_stack_splash
-
-        lda #$01
-        tsb program_sreg
-
         jsr print_stack_prefix
 
         lda #$01

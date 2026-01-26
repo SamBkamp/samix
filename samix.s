@@ -45,19 +45,26 @@ _start:
 
         cli
 
-        jsr print_kernel_splash
+        jsr print_stack_splash
 
 _loop:
-        lda counter+$1
-        cmp #$02
-        beq hand_off_to_user_space
-
 
         lda program_sreg        ;check if program sreg lsb is set
         and #$01
         bne _loop
 
-        jsr print_stack_splash
+        lda counter
+        cmp #$ff
+        bne _loop
+
+        clc
+        lda #$01
+        adc program_sreg
+
+        jsr clear_screen
+        jsr print_kernel_splash
+        jmp hand_off_to_user_space
+        
         jmp _loop
 
 hand_off_to_user_space:
@@ -99,7 +106,9 @@ end_toggle:
 ;;syscall handlers
         .include "./kernel_utils/syscall.s"
 
-
+splash_art:
+        .incbin "splash.txt"
+        
 incr_timer:
         inc counter
         bne exit_incr_timer
