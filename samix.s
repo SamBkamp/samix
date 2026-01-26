@@ -8,17 +8,8 @@ T1CH = $6005
 IFR = $600D
 IER = $600E
 
-E = %10000000
-RW = %01000000
-RS = %00100000
-LCD_CTL_MASK = %11100000
-
-BTN_START = %00001000
-BTN_A = %00000010
-BTN_B = %00000100
-
 program_sreg = $00              ;flag variable for software use
-counter = $01                   ;location of the counter
+counter = $01                   ;3 byte value
 last_toggle = $04
 
 ;;one byte values
@@ -31,7 +22,7 @@ irq_y_store = $0204
         .org $8000
 
 splash: .asciiz "samix kernel :3"
-version_num: .asciiz "v0.1.2"
+version_num: .asciiz "v0.2.2"
 hello_msg: .asciiz "stack starts at:"
 _start:
         ldx #$FF
@@ -52,21 +43,30 @@ _start:
         jsr init_timer
         jsr init_screen
 
-        jsr print_kernel_splash
-
         cli
 
+        jsr print_stack_splash
+
 _loop:
-        lda PORTA
-        and #BTN_START
-        beq hand_off_to_user_space     ;only hand program control to user-space program if start has been pressed
 
         lda program_sreg        ;check if program sreg lsb is set
         and #$01
         bne _loop
 
-        jsr print_stack_splash
+        lda counter
+        cmp #$ff
+        bne _loop
+
+        clc
+        lda #$01
+        adc program_sreg
+
+        jsr clear_screen
+        jsr print_kernel_splash
+        jmp hand_off_to_user_space
+        
         jmp _loop
+
 hand_off_to_user_space:
         jsr _main
         jmp _loop
@@ -85,25 +85,30 @@ toggle_led:
 end_toggle:
         rts
 
-;;include your actual program file here
-        .include "ditdah.s"
+ ;;include your actual program file here
+        .include "echo.s"
 
 ;;printing kernel splash
-        .include "print_splash.s"
+        .include "./print_routines/print_splash.s"
 
 ;;code for stack splash printing
-        .include "print_stack.s"
+        .include "./print_routines/print_stack.s"
 
 ;;init code for ports and timers
-        .include "init.s"
+        .include "./kernel_utils/init.s"
 
 ;;screen related boiler plate code
-        .include "screen.s"
+        .include "./lcd/screen.s"
 
 ;;utility code
-        .include "util.s"
+        .include "./kernel_utils/util.s"
 
+;;syscall handlers
+        .include "./kernel_utils/syscall.s"
 
+splash_art:
+        .incbin "splash.raw"
+        
 incr_timer:
         inc counter
         bne exit_incr_timer
@@ -151,7 +156,7 @@ exit_irq:
 ;;syscall table, the page before the jump table
         .org $FF00
 syscall_table:
-        .word print_char
+        .word write
         .word div_by_ten
         .word _main
 
