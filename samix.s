@@ -22,7 +22,7 @@ irq_y_store = $0204
         .org $8000
 
 splash: .asciiz "samix kernel :3"
-version_num: .asciiz "v0.1.2"
+version_num: .asciiz "v0.2.2"
 hello_msg: .asciiz "stack starts at:"
 _start:
         ldx #$FF
