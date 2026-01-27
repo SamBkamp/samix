@@ -45,26 +45,18 @@ _start:
 
         cli
 
-        jsr print_stack_splash
-
 _loop:
-
-        lda program_sreg        ;check if program sreg lsb is set
+        lda program_sreg
         and #$01
         bne _loop
 
-        lda counter
-        cmp #$ff
-        bne _loop
-
-        clc
-        lda #$01
-        adc program_sreg
-
+        ora #$01
+        sta program_sreg
         jsr clear_screen
+        ldy #$00                ;print to lcd
         jsr print_kernel_splash
         jmp hand_off_to_user_space
-        
+
         jmp _loop
 
 hand_off_to_user_space:
@@ -108,7 +100,7 @@ end_toggle:
 
 splash_art:
         .incbin "splash.raw"
-        
+
 incr_timer:
         inc counter
         bne exit_incr_timer

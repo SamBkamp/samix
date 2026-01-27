@@ -3,7 +3,6 @@ print_kernel_splash:
         phx
         phy
         ldx #$0
-        ldy #$00 ;for write syscall
 _print_splash_loop:
         lda splash, x
         beq _prep_version_print
@@ -15,6 +14,16 @@ _print_splash_loop:
         plx
         jmp _print_splash_loop
 _prep_version_print:
+        tya                     ;different newline implementation based on target
+        and #$FF
+        beq _prep_version_lcd   ;for lcd
+        lda #RETURN             ;for serial connection
+        jsr serial_char
+        lda #NEWLINE
+        jsr serial_char
+        ldx #$00
+        jmp _print_version_loop
+_prep_version_lcd:
         lda #$01
         jsr go_to_line
         ldx #$0

@@ -2,8 +2,6 @@ _main = echo
 char_buffer = $0300             ;uses full page
 char_buffer_idx = $0400         ;one byte value
 
-
-
 ;;control characters
 NEWLINE = $0a
 RETURN = $0d
@@ -46,8 +44,10 @@ echo:
 
         jsr print_motd
         lda #">"
-        sta ACIA_DATA_REG
-        jsr uart_bug_loop
+        ldx #$00
+        ldy #$01
+        brk
+        nop
 
 event_loop:
         lda ACIA_STATUS_REG
@@ -64,11 +64,12 @@ event_loop:
         lda #NEWLINE            ;send newline so we send back \r\n
         sta ACIA_DATA_REG
         jsr uart_bug_loop
-        jsr print_char_buffer
+        lda char_buffer
+        jsr shell_instruction
         lda #">"                ;print shell char
         sta ACIA_DATA_REG
         jsr uart_bug_loop
-        lda #$00                ;store 0 to char buffer if return was sent
+        jmp _event_loop_end
 _not_return:                    ;store char in a to char buffer
         ldx char_buffer_idx
         sta char_buffer, x
@@ -76,6 +77,34 @@ _not_return:                    ;store char in a to char buffer
         jsr uart_bug_loop
 _event_loop_end:
         jmp event_loop
+        rts
+
+shell_instruction:
+        pha
+        phy
+        cmp #"v"
+        bne _next_shell_instruction
+        ldy #$01
+        jsr print_kernel_splash
+        jmp _shell_end
+_next_shell_instruction:
+        cmp #"s"
+        bne _instruction_not_recognised
+        ldy #$01
+        jsr print_stack_splash
+_shell_end:                     ;resets the char_buffer and print \r\n
+        ldy #$00
+        sty char_buffer_idx     ;reset char buffer idx to start of buffer
+        lda #RETURN
+        jsr serial_char
+        lda #NEWLINE
+        jsr serial_char
+        jmp _shell_instruction_exit
+_instruction_not_recognised:
+        jsr print_char_buffer
+_shell_instruction_exit:
+        ply
+        pla
         rts
 
 print_char_buffer:

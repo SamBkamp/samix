@@ -2,11 +2,22 @@ print_stack_splash:
         pha
         phx
         phy
-        ldy #$00                ;for write syscall
+        cpy #$00
+        beq _stack_splash_to_lcd
+        jsr print_stack_prefix
+        lda #RETURN
+        jsr serial_char
+        lda #NEWLINE
+        jsr serial_char
+        jmp _print_addr_hex_prefix
+_stack_splash_to_lcd:
+        jsr clear_screen
+        jsr return_home
         jsr print_stack_prefix
         lda #$01
         jsr go_to_line          ;go to second line
 
+_print_addr_hex_prefix:
 ;;hex prefix
         lda #"0"
         ldx #$00
@@ -27,8 +38,6 @@ _end_print_stack_splash:
 
 print_stack_prefix:
         pha
-        jsr clear_screen
-        jsr return_home
         ldx #$0
 _print_stack_loop:
         lda hello_msg, x
