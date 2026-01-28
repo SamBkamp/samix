@@ -120,12 +120,12 @@ _irq:
         and #%10000000
         bne service_timer
 service_syscall:                ;this whole section functions as an indexed jsr call (ie. implementing the nonexistend jsr (#,x) )
-        lda irq_a_store
         ldy #>exit_irq           ;load hi byte of return address
         phy
         ldy #<exit_irq           ;load lo byte of return address
         phy                     ;store data on the stack for rts later
         ldy irq_y_store
+        lda irq_a_store
         jmp (syscall_table, x)
         ;this doesn't fall through as the return address is set for exit_irq
 service_timer:
@@ -149,8 +149,8 @@ exit_irq:
         .org $FF00
 syscall_table:
         .word write
-        .word div_by_ten
-        .word _main
+        .word print_char
+        .word serial_char
 
 ;; jump table
         .org $FFFA

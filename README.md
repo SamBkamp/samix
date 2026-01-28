@@ -41,11 +41,11 @@ A weird quirk with the brk instruction is that most assemblers treat it as a one
 
 ### syscall list
 
-| Name       | Description                                                                                         | A    | X | Y   |
-|------------|-----------------------------------------------------------------------------------------------------|------|---|-----|
-| write      | prints char `char` to lcd (y = 0) or serial port (y = 1)                                            | char | 0 | 0/1 |
-| div_by_ten | divides value in memory at location `value` by 10, puts remainder in memory at location `remainder` |      | 1 |     |
-| _main      | the main program                                                                                    |      | 2 |     |
+| Name        | Description                                                  | A    | X | Y   |
+|-------------|--------------------------------------------------------------|------|---|-----|
+| write       | prints char `char` to lcd (y = 0) or serial port (y = 1)     | char | 0 | 0/1 |
+| print_char  | alias for write syscall to lcd                               | char | 2 |     |
+| serial_char | alias for write sycall to serial out                         | char | 4 |     |
 
 
 
