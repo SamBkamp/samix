@@ -8,16 +8,15 @@ T1CH = $6005
 IFR = $600D
 IER = $600E
 
-program_sreg = $00              ;flag variable for software use
-counter = $01                   ;3 byte value
-last_toggle = $04
-
 ;;one byte values
 value = $0200
 remainder = $0201
 irq_a_store = $0202
 irq_x_store = $0203
 irq_y_store = $0204
+program_sreg = $0205            ;flag variable for software use
+counter = $0206                 ;3 byte value
+last_toggle = $0209
 
         .org $8000
 
@@ -117,7 +116,7 @@ _irq:
         stx irq_x_store
         sty irq_y_store
         lda IFR
-        and #%10000000
+        and #%10000000          ;check if int is set in ifr
         bne service_timer
 service_syscall:                ;this whole section functions as an indexed jsr call (ie. implementing the nonexistend jsr (#,x) )
         ldy #>exit_irq           ;load hi byte of return address
@@ -131,13 +130,6 @@ service_syscall:                ;this whole section functions as an indexed jsr 
 service_timer:
         bit T1CL
         jsr incr_timer
-        jsr toggle_led
-        lda PORTA
-        and #%00000010
-        bne exit_irq
-        lda #%00000010
-        ora program_sreg
-        sta program_sreg
 exit_irq:
         nop
         lda irq_a_store
