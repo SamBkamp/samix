@@ -72,7 +72,7 @@ end_toggle:
         rts
 
  ;;include your actual program file here
-        .include "echo.s"
+        .include "sash.s"
 
 ;;printing kernel splash
         .include "./print_routines/print_splash.s"
