@@ -68,8 +68,13 @@ _check_newline:
         lda #NEWLINE            ;send \n
         sta ACIA_DATA_REG
         jsr uart_bug_loop
+
+        lda char_buffer_idx     ;if no char was inputted, skip
+        beq _skip_instruction
+
         lda char_buffer
         jsr shell_instruction
+_skip_instruction:
         lda #">"                ;print shell char
         sta ACIA_DATA_REG
         jsr uart_bug_loop
