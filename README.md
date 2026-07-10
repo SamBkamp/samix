@@ -41,24 +41,18 @@ and `make install` will install it onto the AT28C256 rom chip using minipro
 
 ## syscalls
 
-samix implements some syscalls which user-space programs can use by using the `brk` instruction
+samix implements some syscalls which user-space programs can call 
 
-**IMPORTANT NOTE ABOUT SYSCALLS:**
-A weird quirk with the brk instruction is that most assemblers treat it as a one-byte instruction, whereas the CPU treats it as a 2 byte instruction. This causes issues with return alignment in many cases. _if your assembler assembles brk as a one-byte instructrion, you must follow the brk immediately with a nop to preserve return-address alignment_. Example:
+**SYSCALLS ARE NO LONGER CALLED WITH THE BRK INSTRUCTION, USE `jsr` INSTEAD**
 
-```asm
-        ldx #$00    ;syscall number
-        brk         ;call syscall
-        nop         ;alignment
-```
 
 ### syscall list
 
-| Name         | Description                                                  | A    | X | Y   |
-|--------------|--------------------------------------------------------------|------|---|-----|
-| write        | prints char `char` to lcd (y = 0) or serial port (y = 1)     | char | 0 | 0/1 |
-| write_lcd    | alias for write syscall to lcd                               | char | 2 |     |
-| write_serial | alias for write sycall to serial out                         | char | 4 |     |
+| Name         | Description                                                  | A    | Y   |
+|--------------|--------------------------------------------------------------|------|-----|
+| write        | prints char `char` to lcd (y = 0) or serial port (y = 1)     | char | 0/1 |
+| write_lcd    | alias for write syscall to lcd                               | char |     |
+| write_serial | alias for write sycall to serial out                         | char |     |
 
 
 

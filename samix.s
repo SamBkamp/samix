@@ -56,7 +56,7 @@ toggle_led:
 end_toggle:
         rts
 
- ;;include your actual program file here
+;;include your actual program file here
         .include "sash/sash.s"
 
 ;;printing kernel splash
@@ -69,7 +69,7 @@ end_toggle:
         .include "./kernel_utils/init.s"
 
 ;;screen related boiler plate code
-        .include "./lcd/screen.s"
+        .include "./lcd/screen_4bit.s"
 
 ;;utility code
         .include "./kernel_utils/util.s"

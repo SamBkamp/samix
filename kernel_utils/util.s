@@ -24,8 +24,7 @@ print_low_nibble:
 _nibble_not_letter:
         adc #"0"
 _print_nibble:
-        ldx #$00
-        brk
+        jsr write
         nop
 
         plx

@@ -1,3 +1,4 @@
+;;wrapper function to redirect a write syscall to serial or to lcd
 write:
         cpy #$0
         beq lcd_write

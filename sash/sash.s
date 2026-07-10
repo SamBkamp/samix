@@ -45,10 +45,7 @@ echo:
         jsr write_serial
 
         lda #">"
-        ldx #$00
-        ldy #$01
-        brk
-        nop
+        jsr write_serial
 
 event_loop:
         lda ACIA_STATUS_REG

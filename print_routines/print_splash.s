@@ -8,9 +8,7 @@ _print_splash_loop:
         beq _prep_version_print
         inx
         phx
-        ldx #$00
-        brk
-        nop
+        jsr write
         plx
         jmp _print_splash_loop
 _prep_version_print:
@@ -31,9 +29,7 @@ _print_version_loop:
         lda version_num, x
         beq _print_kernel_splash_exit
         phx
-        ldx #$00
-        brk
-        nop
+        jsr write
         plx
         inx
         jmp _print_version_loop

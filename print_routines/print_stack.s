@@ -21,13 +21,11 @@ _stack_splash_to_lcd:
 ;;print hex prefix 0x
 _print_addr_hex_prefix:
         lda #"0"
-        ldx #$00
-        brk
+        jsr write
         nop
 
         lda #"x"
-        brk
-        nop
+        jsr write
 
         jsr print_stack_address
 _end_print_stack_splash:
@@ -44,9 +42,7 @@ _print_stack_loop:
         lda hello_msg, x
         beq _exit_stack_hello
         phx
-        ldx #$00
-        brk
-        nop
+        jsr write
         plx
         inx
         jmp _print_stack_loop
