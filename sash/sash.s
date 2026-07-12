@@ -178,9 +178,25 @@ _next_shell_instruction5:
 
 _next_shell_instruction6:
         cmp #"q"
-        bne _instruction_not_recognised
+        bne _next_shell_instruction7
+
+        ldy #$01                ;to output to serial
         jsr next_random
         jsr print_byte_to_hex
+        jmp _shell_end
+
+_next_shell_instruction7:       ;printing active process count
+        cmp #"n"
+        bne _instruction_not_recognised
+
+        ldy #$01                ;to output to serial
+        lda PROCESS_COUNTER
+        jsr div_by_hex          ;will return first nibble in a and second nibble in y
+        jsr print_low_nibble
+
+        lda PROCESS_COUNTER
+        jsr print_low_nibble
+
         jmp _shell_end
 
 _instruction_not_recognised:

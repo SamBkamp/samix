@@ -1,6 +1,9 @@
         .include "addresses.s"
         .org $8000
 
+;;configuration
+PROCESS_STACK_SIZE = $40        ;64 bytes
+
 splash: .asciiz "samix kernel :3"
 version_num: .asciiz "v0.3.3"
 hello_msg: .asciiz "stack starts at:"
@@ -17,6 +20,7 @@ _start:
         sta counter+$2
         sta last_toggle
         sta program_sreg
+        sta PROCESS_COUNTER
 
         jsr init_ports
         jsr init_timer
@@ -39,6 +43,14 @@ _loop:
         jmp _loop
 
 hand_off_to_user_space:
+        tsx
+        txa                     ;you can't stx indexed with y
+        ldy PROCESS_COUNTER
+        sta PROCCESS_TABLE_PAGE, y
+        inc PROCESS_COUNTER
+        lda #$0
+        ldx #$0
+        ldy #$0
         jsr _main
         jmp _loop
 
@@ -92,37 +104,21 @@ exit_incr_timer:
 _nmi:
         rti
 _irq:
-        sta irq_a_store
-        stx irq_x_store
-        sty irq_y_store
+        pha
+        phx
+        phy
         lda IFR
         and #%10000000          ;check if int is set in ifr
         bne service_timer
-service_syscall:                ;this whole section functions as an indexed jsr call (ie. implementing the nonexistend jsr (#,x) )
-        ldy #>exit_irq           ;load hi byte of return address
-        phy
-        ldy #<exit_irq           ;load lo byte of return address
-        phy                     ;store data on the stack for rts later
-        ldy irq_y_store
-        lda irq_a_store
-        jmp (syscall_table, x)
-        ;this doesn't fall through as the return address is set for exit_irq
 service_timer:
         bit T1CL
         jsr incr_timer
 exit_irq:
-        nop                     ;for syscall alignment reasons
-        lda irq_a_store
-        ldx irq_x_store
-        ldy irq_y_store
+        pla
+        plx
+        ply
         rti
 
-;;syscall table, the page before the jump table
-        .org $FF00
-syscall_table:
-        .word write
-        .word write_lcd
-        .word write_serial
 
 ;; jump table
         .org $FFFA

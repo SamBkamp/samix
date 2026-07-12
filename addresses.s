@@ -33,3 +33,8 @@ ACIA_DATA_REG = $5000
 ACIA_STATUS_REG = $5001
 ACIA_CMD_REG = $5002
 ACIA_CTRL_REG = $5003
+
+
+;;pid stuff
+PROCESS_COUNTER = $0210         ;keeps track of how many SP we have
+PROCCESS_TABLE_PAGE = $0600
