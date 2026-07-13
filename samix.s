@@ -21,36 +21,30 @@ _start:
         sta last_toggle
         sta program_sreg
         sta PROCESS_COUNTER
+        sta CURRENT_TASK
 
         jsr init_ports
         jsr init_timer
         jsr init_screen
 
-        cli
-
-_loop:
-        lda program_sreg
-        and #$01
-        bne _loop
-
-        ora #$01
-        sta program_sreg
         jsr clear_screen
         ldy #$00                ;print to lcd
         jsr print_kernel_splash
         jmp hand_off_to_user_space
 
+_loop:
         jmp _loop
 
 hand_off_to_user_space:
         tsx
         txa                     ;you can't stx indexed with y
         ldy PROCESS_COUNTER
-        sta PROCCESS_TABLE_PAGE, y
+        sta PROCESS_TABLE_PAGE, y
         inc PROCESS_COUNTER
         lda #$0
         ldx #$0
         ldy #$0
+        cli
         jsr _main
         jmp _loop
 
@@ -109,14 +103,31 @@ _irq:
         phy
         lda IFR
         and #%10000000          ;check if int is set in ifr
-        bne service_timer
-service_timer:
-        bit T1CL
+        beq _task_switch         ;if its ifr, we must inc timer before switching the task
+        bit T1CL                ;unassert VIA
         jsr incr_timer
-exit_irq:
-        pla
-        plx
+
+_task_switch:
+        tsx                     ;get stack pointer into a
+        txa
+        ldx CURRENT_TASK        ;get the current task in the process table
+        sta PROCESS_TABLE_PAGE, x ;store the sp in the PT
+
+;;note: PROCESS_COUNTER is 1 indexed, but CURRENT_TASK is 0 indexed, so
+;;when they are equal, we have reached one passed the last item on the list
+        inx                     ;increment our task to next task
+        cpx PROCESS_COUNTER     ;check if we've reached end of list
+        bne _no_reset_task_list
+        ldx #0                  ;if we have reached end, reset to 0
+_no_reset_task_list:            ;otherwise we keep whatever is in x already
+        stx CURRENT_TASK
+        lda PROCESS_TABLE_PAGE, x ;load the sp of our next process
+        tax
+        txs
+exit_irq:                       ;this should pop a, x, and y from our new stack location
         ply
+        plx
+        pla
         rti
 
 

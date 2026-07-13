@@ -37,4 +37,10 @@ ACIA_CTRL_REG = $5003
 
 ;;pid stuff
 PROCESS_COUNTER = $0210         ;keeps track of how many SP we have
-PROCCESS_TABLE_PAGE = $0600
+CURRENT_TASK = $020A            ;an index + 0x600, pointing at which process we're currently running
+PROCESS_TABLE_PAGE = $0600
+;;process table page contains a struct looking like this:
+;;
+;;  typedef struct {
+;;    uint8_t sp;
+;;  }proccess;
