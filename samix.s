@@ -24,6 +24,9 @@ _start:
         sta CURRENT_TASK
         sta WASTE_TIME_TIMER_STORE
 
+        lda #"0"
+        sta THING_TO_PRINT
+
         jsr init_ports
         jsr init_timer
         jsr init_screen
@@ -114,10 +117,43 @@ fork:
         rts
 
 time_waste:
+        sei
+        jsr clear_screen
+        cli
+        ldy counter+$1
+        iny
+        iny
+        sty WASTE_TIME_TIMER_STORE
 
+_time_waste_loop:
+        lda WASTE_TIME_TIMER_STORE
+        adc #$2
+        cmp counter+$1
+        bne _time_waste_loop
 
-        jmp time_waste
+        sta WASTE_TIME_TIMER_STORE
+        sei
+        jsr clear_screen
+        cli
 
+        ldx #$00
+_time_waste_print_loop:
+        lda time_waste_prefix, x
+        beq _tw_print_char
+        jsr write_lcd
+        inx
+        jmp _time_waste_print_loop
+
+_tw_print_char:
+        lda THING_TO_PRINT
+        jsr write_lcd
+        inc
+        sta THING_TO_PRINT
+
+        jmp _time_waste_loop
+
+time_waste_prefix:
+        .asciiz "counter now:"
 
 ;;include your actual program file here
         .include "sash/sash.s"

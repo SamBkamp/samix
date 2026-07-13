@@ -207,7 +207,7 @@ _next_shell_instruction8:       ;fork!!
         jsr fork
 
         jmp _shell_end
-        
+
 _instruction_not_recognised:
         ldx #$00
 _instruction_nr_loop:
