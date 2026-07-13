@@ -22,6 +22,7 @@ _start:
         sta program_sreg
         sta PROCESS_COUNTER
         sta CURRENT_TASK
+        sta WASTE_TIME_TIMER_STORE
 
         jsr init_ports
         jsr init_timer
@@ -61,6 +62,62 @@ toggle_led:
         sta last_toggle
 end_toggle:
         rts
+
+
+stack_start_offset_table:
+        .byte 00, 64, 128, 192
+
+fork:
+        sei
+        pha
+        phx
+        phy
+
+        tsx
+        stx TASK_SWITCH_OLD_SF  ;save old stack frame pointer
+
+        ldy PROCESS_COUNTER     ;load the (1 indexed) process counter
+        lda stack_start_offset_table, y ;load the stack start location
+
+        tax                             ;change stack frame
+        txs
+
+
+        lda #>time_waste        ;store high byte
+        pha
+        lda #<time_waste        ;low byte on stack
+        pha
+
+        lda #%00100000          ;default P value
+        pha
+
+        lda #0
+        pha                     ;inital A reg
+        pha                     ;inital X reg
+        pha                     ;initial Y reg
+
+        ldy PROCESS_COUNTER     ;save current stack frame to process table
+        tsx
+        txa
+        sta PROCESS_TABLE_PAGE, y
+
+        iny
+        sty PROCESS_COUNTER
+
+        ldx TASK_SWITCH_OLD_SF
+        txs                     ;reinstate old stack pointer
+
+        ply
+        plx
+        pla
+        cli
+        rts
+
+time_waste:
+
+
+        jmp time_waste
+
 
 ;;include your actual program file here
         .include "sash/sash.s"

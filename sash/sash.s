@@ -112,13 +112,14 @@ _event_loop_end:
 
 unknown_command_string: .asciiz "unknown command"
 help_string:
+;        .asciiz "Available commands:", RETURN, NEWLINE
         .byte "Available commands:", RETURN, NEWLINE
         .byte "v - prints version splash", RETURN, NEWLINE
         .byte "s - prints current stack pointer location", RETURN, NEWLINE
         .byte "r xxxx - prints the byte at address xxxx, the address can be 1, 2, 3 or 4 bytes long", RETURN, NEWLINE
-        .byte "w xxxx yy - writes the byte yy to address xxxx, address can be 1-4 bytes, byte needs to be 2 bytes. Hexademical representation", RETURN, NEWLINE
-        .byte "P [str] - prints the string passed as argument to the LCD", RETURN, NEWLINE
-        .byte "q - returns a pseudo random byte"
+;        .byte "w xxxx yy - writes the byte yy to address xxxx, address can be 1-4 bytes, byte needs to be 2 bytes. Hexademical representation", RETURN, NEWLINE
+;        .byte "P [str] - prints the string passed as argument to the LCD", RETURN, NEWLINE
+;        .byte "q - returns a pseudo random byte"
         .byte 0
 
 shell_instruction:
@@ -187,7 +188,7 @@ _next_shell_instruction6:
 
 _next_shell_instruction7:       ;printing active process count
         cmp #"n"
-        bne _instruction_not_recognised
+        bne _next_shell_instruction8
 
         ldy #$01                ;to output to serial
         lda PROCESS_COUNTER
@@ -199,6 +200,14 @@ _next_shell_instruction7:       ;printing active process count
 
         jmp _shell_end
 
+_next_shell_instruction8:       ;fork!!
+        cmp #"f"
+        bne _instruction_not_recognised
+
+        jsr fork
+
+        jmp _shell_end
+        
 _instruction_not_recognised:
         ldx #$00
 _instruction_nr_loop:
