@@ -28,9 +28,9 @@ after this, the kernel splash will be printed to the lcd and and the kernel will
 
 ## concurrency (interleaving)
 
-Samix is a rudimentary [time sharing OS][tsos_wiki]  meaning you are able to run several programs in "parallel". Because this CPU only has 1 core, only one program can run at a given moment, however, the kernel is programmed to recieve an interrupt every so often from the VIA where it will execute a "context switch", replacing registers and stack information before switching to another program. This happens quick enough that it is in function able to execute more than one program at the same time. You can start a new process with the `fork` function. More documentation to come as this feature gets fleshed out.
+Samix is a rudimentary [time sharing OS](tsos_wiki) meaning you are able to run several programs in "parallel". Because this CPU only has 1 core, only one program can run at a given moment, however, the kernel is programmed to recieve an interrupt every so often from the VIA where it will execute a "context switch", replacing registers and stack information before switching to another program. This happens quick enough that it is in function able to execute more than one program at the same time. You can start a new process with the `fork` function. More documentation to come as this feature gets fleshed out.
 
-**at the moment, every call to `fork()` only executes the same new process, soon you will be able to pass the entry point in explicity, peep [samix.s:73](samix.s) if you want to help with that.
+**at the moment, every call to `fork()` only executes the same new process, soon you will be able to pass the entry point in explicity, peep [samix.s:73](samix.s) if you want to help with that.**
 
 ## user-defined programs
 
