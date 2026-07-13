@@ -26,7 +26,13 @@ On startup, samix inits a 10khz counter (that is, a counter that increments 10k 
 after this, the kernel splash will be printed to the lcd and and the kernel will hand off program control to the user program.
 
 
-## user-defined program
+## concurrency (interleaving)
+
+Samix is a rudimentary [time sharing OS][tsos_wiki]  meaning you are able to run several programs in "parallel". Because this CPU only has 1 core, only one program can run at a given moment, however, the kernel is programmed to recieve an interrupt every so often from the VIA where it will execute a "context switch", replacing registers and stack information before switching to another program. This happens quick enough that it is in function able to execute more than one program at the same time. You can start a new process with the `fork` function. More documentation to come as this feature gets fleshed out.
+
+**at the moment, every call to `fork()` only executes the same new process, soon you will be able to pass the entry point in explicity, peep [samix.s:73](samix.s) if you want to help with that.
+
+## user-defined programs
 
 After the kernel startup sequence, the kernel hands off control to the user defined program through a jump. The kernel will jump to _main (which will need to be defined at compile time) and the user defined program will take control. You can write your _main in the `samix.s` file, but I suggest to instead use vasm's `.include` directive.
 
@@ -41,7 +47,7 @@ and `make install` will install it onto the AT28C256 rom chip using minipro
 
 ## syscalls
 
-samix implements some syscalls which user-space programs can call 
+samix implements some syscalls which user-space programs can call
 
 **SYSCALLS ARE NO LONGER CALLED WITH THE BRK INSTRUCTION, USE `jsr` INSTEAD**
 
@@ -68,3 +74,5 @@ samix implements some syscalls which user-space programs can call
 
 
 **\* = only applicable to serial connection variant**
+
+[tsos-wiki]: https://en.wikipedia.org/wiki/Time-sharing
