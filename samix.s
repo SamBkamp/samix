@@ -14,6 +14,8 @@ _start:
         lda #%10101010          ;just alternating 1s and 0s. NUMSN
         sta random              ;init random counter
 
+        jsr serial_setup
+
         lda #$0                 ;init counter
         sta counter
         sta counter+$1
@@ -126,8 +128,8 @@ time_waste:
         jsr clear_screen
         cli
         ldy counter+$1
-        iny
-        iny
+        dey
+        dey
         sty WASTE_TIME_TIMER_STORE
 
 _time_waste_loop:
