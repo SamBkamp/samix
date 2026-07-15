@@ -58,3 +58,18 @@ _next_random_loop:
         lda random_internal_state
         plx
         rts
+
+print_string_to_serial:
+        pha
+        phy
+        ldy #$00
+_psts_loop:
+        lda (string_to_serial_buff), y
+        beq _psts_exit
+        jsr write_serial
+        iny
+        jmp _psts_loop
+_psts_exit:
+        ply
+        pla
+        rts

@@ -21,6 +21,7 @@ counter = $0204                 ;3 byte value
 last_toggle = $0207             ;one byte value
 random = $0208                  ;one byte value
 random_internal_state  = $0209  ;one byte value
+string_to_serial_buff = $0000   ;two byte value
 
 ;;sash addresses
 char_buffer = $0300             ;uses full page
@@ -34,14 +35,15 @@ ACIA_STATUS_REG = $5001
 ACIA_CMD_REG = $5002
 ACIA_CTRL_REG = $5003
 
-
 ;;pid stuff
+PROCESS_ACTIVE = $0
 PROCESS_COUNTER = $0210         ;keeps track of how many SP we have
 CURRENT_TASK = $020A            ;an index + 0x600, pointing at which process we're currently running
 TASK_SWITCH_OLD_SF = $020B
 WASTE_TIME_TIMER_STORE = $020C
 THING_TO_PRINT = $020D
-PROCESS_TABLE_PAGE = $0600
+PROCESS_TABLE_PAGE = $0600      ;for process SP
+PROCESS_STATUS_PAGE = $0680     ;for process status (0 = active, 1 = dead, 2 = sleep)
 ;;process table page contains a struct looking like this:
 ;;
 ;;  typedef struct {

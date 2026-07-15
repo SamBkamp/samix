@@ -54,13 +54,14 @@ samix implements some syscalls which user-space programs can call
 
 ### syscall list
 
-| Name         | Description                                                  | A    | Y   |
-|--------------|--------------------------------------------------------------|------|-----|
-| write        | prints char `char` to lcd (y = 0) or serial port (y = 1)     | char | 0/1 |
-| write_lcd    | alias for write syscall to lcd                               | char |     |
-| write_serial | alias for write sycall to serial out                         | char |     |
+| Name                   | Description                                                  | A    | Y   |
+|------------------------|--------------------------------------------------------------|------|-----|
+| write                  | prints char `char` to lcd (y = 0) or serial port (y = 1)     | char | 0/1 |
+| write_lcd              | alias for write syscall to lcd                               | char |     |
+| write_serial           | alias for write sycall to serial out                         | char |     |
+| print_string_to_serial | prints the string pointer to at string_to_serial_buf (+1)*   | char |     |    
 
-
+* see [sash/sash.s:194](sash/sash.s:194) for a demo
 
 ### Adress map for the BE6502
 

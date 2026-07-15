@@ -3,6 +3,7 @@ _main = echo
 NEWLINE = $0a
 RETURN = $0d
 BACKSPACE = $08
+TAB = $09
 
 ;;status reg masks
 RXR_FULL_MASK = $08
@@ -190,6 +191,12 @@ _next_shell_instruction7:       ;printing active process count
         cmp #"n"
         bne _next_shell_instruction8
 
+        lda #<list_pid_title    ;the pid listing heading
+        sta string_to_serial_buff
+        lda #>list_pid_title
+        sta string_to_serial_buff+1
+        jsr print_string_to_serial
+
         ldy #$01                ;to output to serial
         lda PROCESS_COUNTER
         jsr div_by_hex          ;will return first nibble in a and second nibble in y
@@ -232,6 +239,7 @@ _shell_instruction_exit:
         rts
 
 
+list_pid_title: .asciiz "PID", TAB, "status", RETURN, NEWLINE
         .include "sash/print_to_lcd.s"
         .include "sash/sash_print_routines.s"
         .include "sash/read_mem_address.s"
