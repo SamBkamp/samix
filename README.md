@@ -61,7 +61,7 @@ samix implements some syscalls which user-space programs can call
 | write_serial           | alias for write sycall to serial out                         | char |     |
 | print_string_to_serial | prints the string pointer to at string_to_serial_buf (+1)*   | char |     |    
 
-* see [sash/sash.s:194](sash/sash.s#L194) for a demo
+* see [sash/sash.s:194](https://github.com/SamBkamp/samix/blob/3f927f0871a799a072a7ff83055094f3bd573c8d/sash/sash.s#L194) for a demo
 
 ### Adress map for the BE6502
 
