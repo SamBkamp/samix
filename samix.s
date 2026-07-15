@@ -22,6 +22,7 @@ _start:
         sta program_sreg
         sta PROCESS_COUNTER
         sta CURRENT_TASK
+        sta PROCESS_STATUS_PAGE
         sta WASTE_TIME_TIMER_STORE
 
         lda #"0"
@@ -79,7 +80,11 @@ fork:
         tsx
         stx TASK_SWITCH_OLD_SF  ;save old stack frame pointer
 
+;;1 indexed process counter is used here before incr so it functions as 0 indexed until it is incremented at the end
         ldy PROCESS_COUNTER     ;load the (1 indexed) process counter
+        lda #PROCESS_ACTIVE     ;set the process to active
+        sta PROCESS_STATUS_PAGE, y
+
         lda stack_start_offset_table, y ;load the stack start location
 
         tax                             ;change stack frame
