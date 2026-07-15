@@ -5,11 +5,11 @@ RX_CLK_SRC = %00010000          ;internal generator
 SEL_BAUD_RATE = %00001111       ;19,200 baud
 
 ;;cmd reg settings
-PARITY_MODE = %00000000         ;odd parity tx/rx
-PARITY_MODE_ENABLED = %00000000 ;no parity enabled
-ECHO_MODE = %00000000           ;rx normal mode (no echo)
+ODD_PARITY_MODE = %00000000         ;odd parity tx/rx
+PARITY_MODE_DISABLED = %00000000 ;no parity enabled
+NO_ECHO = %00000000           ;rx normal mode (no echo)
 IRQ_CTRL = %00001000            ;irq pulled low, tx irq disabled
-IRQ_ENABLED = %00000010         ;irq disabled
+IRQ_DISABLED = %00000010         ;irq disabled
 DTR_ENABLED = %00000001         ;dtr ready
 
 serial_setup:
@@ -23,7 +23,7 @@ serial_setup:
         sta ACIA_STATUS_REG         ;write something to the status reg to reset chip
         lda #( STOP_BIT_N | WORD_LEN | RX_CLK_SRC | SEL_BAUD_RATE )
         sta ACIA_CTRL_REG
-        lda #( PARITY_MODE | PARITY_MODE_ENABLED | ECHO_MODE | IRQ_CTRL | IRQ_ENABLED | DTR_ENABLED )
+        lda #( ODD_PARITY_MODE | PARITY_MODE_DISABLED | NO_ECHO | IRQ_CTRL | IRQ_DISABLED | DTR_ENABLED )
         sta ACIA_CMD_REG
         pla
         rts
