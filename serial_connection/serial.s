@@ -12,6 +12,18 @@ IRQ_CTRL = %00001000            ;irq pulled low, tx irq disabled
 IRQ_DISABLED = %00000010         ;irq disabled
 DTR_ENABLED = %00000001         ;dtr ready
 
+
+;;status reg stuff
+ACIA_PARITY_ERROR  =        %1
+ACIA_FRAMING_ERROR =       %10
+ACIA_OVERRUN       =      %100
+ACIA_RDR_FULL      =     %1000
+ACIA_TDR_EMPTY     =    %10000
+ACIA_DC_DETECTB    =   %100000
+ACIA_DS_READYB     =  %1000000
+ACIA_IRQ           = %10000000
+
+
 serial_setup:
         pha
         ;init char buffer
@@ -28,7 +40,16 @@ serial_setup:
         pla
         rts
 
+check_new_serial_char:
+        lda ACIA_STATUS_REG
+        and #ACIA_RDR_FULL
+        rts
 
+;;todo, turn this into a ring buffer, with int handling
+;;puts new character in A reg
+read_serial:
+        lda ACIA_DATA_REG
+        rts
 
 write_serial:
         pha

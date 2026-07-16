@@ -5,7 +5,7 @@
 PROCESS_STACK_SIZE = $40        ;64 bytes
 
 splash: .asciiz "samix kernel :3"
-version_num: .asciiz "v0.3.3"
+version_num: .asciiz "v0.4.3"
 hello_msg: .asciiz "stack starts at:"
 _start:
         ldx #$FF

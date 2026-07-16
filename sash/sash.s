@@ -1,4 +1,4 @@
-_main = echo
+_main = sash
 ;;control characters
 NEWLINE = $0a
 RETURN = $0d
@@ -11,7 +11,7 @@ TXR_FULL_MASK = %00010000
 
 
 
-echo:
+sash:
 
         lda counter
 
@@ -27,8 +27,7 @@ echo:
         jsr write_serial
 
 event_loop:
-        lda ACIA_STATUS_REG
-        and #$08
+        jsr check_new_serial_char
         beq event_loop
 
 ;;new character recieved
@@ -36,7 +35,7 @@ event_loop:
         eor random
         sta random
 
-        lda ACIA_DATA_REG
+        jsr read_serial
         cmp #RETURN
         bne _check_backspace
 
@@ -52,8 +51,7 @@ event_loop:
         jsr shell_instruction
 _skip_instruction:
         lda #">"                ;print shell char
-        sta ACIA_DATA_REG
-        jsr uart_bug_loop
+        jsr write_serial
         jmp _event_loop_end
 
 _check_backspace:
@@ -64,26 +62,22 @@ _check_backspace:
         beq _event_loop_end     ;if char buffer idx is already 0, we don't need to do anything
 
         lda #BACKSPACE
-        sta ACIA_DATA_REG       ;send backspace back
-        jsr uart_bug_loop
+        jsr write_serial
 
         lda #" "                ;send whitespace to erase char
-        sta ACIA_DATA_REG
-        jsr uart_bug_loop
+        jsr write_serial
 
         lda #BACKSPACE          ;send backspace to realign terminal
-        sta ACIA_DATA_REG
-        jsr uart_bug_loop
+        jsr write_serial
 
         dec char_buffer_idx
         jmp _event_loop_end
 
 _not_ctrlchar:                  ;store char in a to char buffer
-        sta ACIA_DATA_REG       ;send character back
+        jsr write_serial        ;send character back
         ldx char_buffer_idx
         sta char_buffer, x
         inc char_buffer_idx
-        jsr uart_bug_loop
 
 _event_loop_end:
         jmp event_loop
