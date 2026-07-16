@@ -1,4 +1,4 @@
-_main = echo
+_main = sash
 ;;control characters
 NEWLINE = $0a
 RETURN = $0d
@@ -9,31 +9,9 @@ TAB = $09
 RXR_FULL_MASK = $08
 TXR_FULL_MASK = %00010000
 
-;;ctrl reg settings
-STOP_BIT_N = %00000000          ;1 stop bit
-WORD_LEN = %00000000            ;8 bit word
-RX_CLK_SRC = %00010000          ;internal generator
-SEL_BAUD_RATE = %00001111       ;19,200 baud
-
-;;cmd reg settings
-PARITY_MODE = %00000000         ;odd parity tx/rx
-PARITY_MODE_ENABLED = %00000000 ;no parity enabled
-ECHO_MODE = %00000000           ;rx normal mode (no echo)
-IRQ_CTRL = %00001000            ;irq pulled low, tx irq disabled
-IRQ_ENABLED = %00000010         ;irq disabled
-DTR_ENABLED = %00000001         ;dtr ready
-echo:
-        ;init char buffer
-        lda #$00
-        sta char_buffer_idx
 
 
-        ;init acia
-        sta ACIA_STATUS_REG         ;write something to the status reg to reset chip
-        lda #( STOP_BIT_N | WORD_LEN | RX_CLK_SRC | SEL_BAUD_RATE )
-        sta ACIA_CTRL_REG
-        lda #( PARITY_MODE | PARITY_MODE_ENABLED | ECHO_MODE | IRQ_CTRL | IRQ_ENABLED | DTR_ENABLED )
-        sta ACIA_CMD_REG
+sash:
 
         lda counter
 
@@ -49,8 +27,7 @@ echo:
         jsr write_serial
 
 event_loop:
-        lda ACIA_STATUS_REG
-        and #$08
+        jsr check_new_serial_char
         beq event_loop
 
 ;;new character recieved
@@ -58,14 +35,14 @@ event_loop:
         eor random
         sta random
 
-        lda ACIA_DATA_REG
+        jsr read_serial
         cmp #RETURN
         bne _check_backspace
-_check_newline:
-        sta ACIA_DATA_REG       ;send back \r
+
+;;newline recieved
+        jsr write_serial       ;send back \r
         lda #NEWLINE            ;send \n
-        sta ACIA_DATA_REG
-        jsr uart_bug_loop
+        jsr write_serial
 
         lda char_buffer_idx     ;if no char was inputted, skip
         beq _skip_instruction
@@ -74,8 +51,7 @@ _check_newline:
         jsr shell_instruction
 _skip_instruction:
         lda #">"                ;print shell char
-        sta ACIA_DATA_REG
-        jsr uart_bug_loop
+        jsr write_serial
         jmp _event_loop_end
 
 _check_backspace:
@@ -86,26 +62,22 @@ _check_backspace:
         beq _event_loop_end     ;if char buffer idx is already 0, we don't need to do anything
 
         lda #BACKSPACE
-        sta ACIA_DATA_REG       ;send backspace back
-        jsr uart_bug_loop
+        jsr write_serial
 
         lda #" "                ;send whitespace to erase char
-        sta ACIA_DATA_REG
-        jsr uart_bug_loop
+        jsr write_serial
 
         lda #BACKSPACE          ;send backspace to realign terminal
-        sta ACIA_DATA_REG
-        jsr uart_bug_loop
+        jsr write_serial
 
         dec char_buffer_idx
         jmp _event_loop_end
 
 _not_ctrlchar:                  ;store char in a to char buffer
-        sta ACIA_DATA_REG       ;send character back
+        jsr write_serial        ;send character back
         ldx char_buffer_idx
         sta char_buffer, x
         inc char_buffer_idx
-        jsr uart_bug_loop
 
 _event_loop_end:
         jmp event_loop

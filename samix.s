@@ -5,7 +5,7 @@
 PROCESS_STACK_SIZE = $40        ;64 bytes
 
 splash: .asciiz "samix kernel :3"
-version_num: .asciiz "v0.3.3"
+version_num: .asciiz "v0.4.3"
 hello_msg: .asciiz "stack starts at:"
 _start:
         ldx #$FF
@@ -13,6 +13,8 @@ _start:
 
         lda #%10101010          ;just alternating 1s and 0s. NUMSN
         sta random              ;init random counter
+
+        jsr serial_setup
 
         lda #$0                 ;init counter
         sta counter
@@ -126,8 +128,8 @@ time_waste:
         jsr clear_screen
         cli
         ldy counter+$1
-        iny
-        iny
+        dey
+        dey
         sty WASTE_TIME_TIMER_STORE
 
 _time_waste_loop:

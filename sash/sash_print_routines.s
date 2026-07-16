@@ -7,18 +7,15 @@ _print_char_buffer_loop:
         beq _print_char_buffer_exit
         lda char_buffer, x
         inx
-        sta ACIA_DATA_REG
-        jsr uart_bug_loop
+        jsr write_serial
         jmp _print_char_buffer_loop
 _print_char_buffer_exit:
         ldx #$00
         stx char_buffer_idx     ;reset char buffer idx to start of buffer
         lda #RETURN
-        sta ACIA_DATA_REG
-        jsr uart_bug_loop
+        jsr write_serial
         lda #NEWLINE
-        sta ACIA_DATA_REG
-        jsr uart_bug_loop
+        jsr write_serial
         plx
         pla
         rts
