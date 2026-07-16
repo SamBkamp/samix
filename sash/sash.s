@@ -139,7 +139,7 @@ _next_shell_instruction4:
         ldx #$00
 _print_help_str_loop:
         lda help_string, x
-        beq _shell_end
+        beq _process_count_end  ;trampoline to _shell_end
         jsr write_serial
         inx
         jmp _print_help_str_loop
@@ -169,13 +169,45 @@ _next_shell_instruction7:       ;printing active process count
         sta string_to_serial_buff+1
         jsr print_string_to_serial
 
-        ldy #$01                ;to output to serial
-        lda PROCESS_COUNTER
-        jsr div_by_hex          ;will return first nibble in a and second nibble in y
-        jsr print_low_nibble
+        ldx #0
+        lda #"-"
+_print_seperator_loop:          ;print "-" 13 times
+        jsr write_serial
+        inx
+        cpx #13
+        bne _print_seperator_loop
 
-        lda PROCESS_COUNTER
-        jsr print_low_nibble
+        jsr write_serial
+        lda #RETURN
+        jsr write_serial
+        lda #NEWLINE
+        jsr write_serial
+
+;;the process counter will never be larger than 0xF so this bit is easy
+        ldx #0
+_process_count_loop:            ;prints x until we reach process counter
+        cpx PROCESS_COUNTER
+        beq _process_count_end
+        txa
+        adc #$30                ;single digit to ascii
+        jsr write_serial
+
+        lda #TAB
+        jsr write_serial
+
+        lda PROCESS_STATUS_PAGE, x ;get process status too
+        adc #$30
+        jsr write_serial
+
+
+        lda #RETURN
+        jsr write_serial
+        lda #NEWLINE
+        jsr write_serial
+        inx
+        jmp _process_count_loop
+
+_process_count_end:
 
         jmp _shell_end
 
