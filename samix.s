@@ -93,9 +93,9 @@ fork:
         txs
 
 
-        lda #>time_waste        ;store high byte
+        lda ENTRYPOINT_H        ;store high byte
         pha
-        lda #<time_waste        ;low byte on stack
+        lda ENTRYPOINT_L       ;low byte on stack
         pha
 
         lda #%00100000          ;default P value
@@ -129,12 +129,11 @@ time_waste:
         cli
         ldy counter+$1
         dey
-        dey
         sty WASTE_TIME_TIMER_STORE
 
 _time_waste_loop:
         lda WASTE_TIME_TIMER_STORE
-        adc #$2
+        inc
         cmp counter+$1
         bne _time_waste_loop
 

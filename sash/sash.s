@@ -183,6 +183,11 @@ _next_shell_instruction8:       ;fork!!
         cmp #"f"
         bne _instruction_not_recognised
 
+        lda #>time_waste
+        sta ENTRYPOINT_H
+        lda #<time_waste
+        sta ENTRYPOINT_L
+
         jsr fork
 
         jmp _shell_end

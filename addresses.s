@@ -41,7 +41,9 @@ PROCESS_COUNTER = $0210         ;keeps track of how many SP we have
 CURRENT_TASK = $020A            ;an index + 0x600, pointing at which process we're currently running
 TASK_SWITCH_OLD_SF = $020B
 WASTE_TIME_TIMER_STORE = $020C
-THING_TO_PRINT = $020D
+ENTRYPOINT_H = $020D
+ENTRYPOINT_L = $020E
+THING_TO_PRINT = $020F
 PROCESS_TABLE_PAGE = $0600      ;for process SP
 PROCESS_STATUS_PAGE = $0680     ;for process status (0 = active, 1 = dead, 2 = sleep)
 ;;process table page contains a struct looking like this:
